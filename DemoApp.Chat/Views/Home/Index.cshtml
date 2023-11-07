@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="page-content page-container" id="page-content">
+    <div class="padding">
+        <div class="row container d-flex justify-content-center">
+            <div class="col-md-6">
+                <div class="card card-bordered">
+                    <div class="card-header">
+                        <h4 class="card-title"><strong>Chat</strong></h4>
+                    </div>
+
+                    <div class="ps-container ps-theme-default ps-active-y" id="chat-content" style="overflow-y: scroll !important; height:400px !important;">                        
+                        <div class="ps-scrollbar-x-rail" style="left: 0px; bottom: 0px;"><div class="ps-scrollbar-x" tabindex="0" style="left: 0px; width: 0px;"></div></div><div class="ps-scrollbar-y-rail" style="top: 0px; height: 0px; right: 2px;"><div class="ps-scrollbar-y" tabindex="0" style="top: 0px; height: 2px;"></div></div>
+                    </div>
+
+                    <div class="publisher bt-1 border-light">
+                        <img class="avatar avatar-xs" src="https://img.icons8.com/color/36/000000/administrator-male.png" alt="...">
+                        <input class="publisher-input" type="text" placeholder="Write something">
+                        <span class="publisher-btn file-group">
+                            <i class="fa fa-paperclip file-browser"></i>
+                            <input type="file">
+                        </span>
+                        <button class="btn btn-outline-secondary">Send</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts{
+    <script src="~/lib/microsoft/signalr/dist/browser/signalr.js" asp-append-version="true"></script>
+
+    <script>
+        var connection = new signalR.HubConnectionBuilder()
+            .withUrl('/chat').build();
+
+        connection.start().then(() => console.log('Hub connected')).catch(msg => console.error(msg));
+
+        connection.on("async", (resp) => {
+            var context = JSON.parse(resp);
+            clearChat();
+            for (var i = 0; i < context.length; i++) {
+                var interaction = context[i];
+                console.log(interaction);
+                // TODO: Recibir nombre de usuario en un modal, y almacenarlo del lado del cliente. 
+                // Luego recuperar el nombre de usuario para realizar la siguiente validación
+                if (interaction.User == 'Luis') {
+                    addHostMessage(interaction);
+                    console.log('Host message:', interaction.Id);
+                } else {
+                    addGuestMessage(interaction);
+                    console.log('Guest message:', interaction.Id);
+                }
+            }
+        });
+    </script>
+}
